@@ -1,0 +1,12 @@
+discraft/commands/WhitelistAdminRemove.java
+ discraft.commands.WhitelistAdminRemove
+discraft/commands/WhitelistRemove.java
+ discraft.commands.WhitelistRemove
+discraft/Discraft.java
+ discraft.Discraft
+discraft/commands/WhitelistAdminAdd.java
+ discraft.commands.WhitelistAdminAdd
+discraft/Bot.java
+ discraft.Bot
+discraft/commands/WhitelistAdd.java
+ discraft.commands.WhitelistAdd
