@@ -11,32 +11,51 @@ import net.dv8tion.jda.api.entities.Member;
 
 import java.util.List;
 import java.util.logging.Logger;
+
+import javax.security.auth.login.LoginException;
+
 import java.util.Optional;
 import java.util.UUID;
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
+
+import discraft.database.DatabaseHandler;
 
 public class Discraft extends JavaPlugin {
     private final String whitelistKey = "whitelist.%s";
     private FileConfiguration config = getConfig();
     private Logger logger = getLogger();
-    private Bot bot;
+    private Optional<Bot> bot;
 
     public Discraft() {
-        this.bot = null;
+        this.bot = Optional.empty();
     }
 
     @Override
     public void onEnable() {
         defaultConfig();
-        this.bot = new Bot(this, config, logger);
-        this.bot.run();
+
+        DatabaseHandler db;
+        try {
+            db = new DatabaseHandler(this, new File(getDataFolder(), "discraft.db"), logger);
+        } catch (SQLException | IOException | ClassNotFoundException e) {
+            logger.info(e.getMessage());
+            return;
+        }
+
+        try {
+            logger.info("Starting bot..");
+            this.bot = Optional.of(new Bot(this, db, config, logger));
+        } catch (LoginException | InterruptedException e) {
+            this.logger.info(e.getMessage());
+        }
     }
 
     @Override
     public void onDisable() {
-        if (this.bot == null) return;
-        this.bot.shutdown();
-        // pain
+        if (this.bot.isPresent()) this.bot.get().stop();
     }
 
     private void defaultConfig() {
@@ -49,7 +68,6 @@ public class Discraft extends JavaPlugin {
         config.addDefault("whitelisted", new HashMap<String, String>());
         config.options().copyDefaults(true);
         saveConfig();
-        // pain
     }
 
     public void runCommand(String command) {
@@ -58,49 +76,4 @@ public class Discraft extends JavaPlugin {
         });
     }
 
-    /*
-    Adds user to whitelist
-    */
-    public void whitelistAdd(String name) {
-        runCommand(String.format("whitelist add %s", name));
-    }
-
-    /*
-    Removes user from whitelist
-    */
-    public void whitelistRemove(String name) {
-        runCommand(String.format("whitelist remove %s", name));
-    }
-    
-
-    @SuppressWarnings("deprecation")
-    public Optional<String> getMCUsername(Member member) {
-        String dbkey = String.format(whitelistKey, member.getId());
-        if (dbkey == null) return Optional.empty();
-        String strUUID = config.getString(dbkey);
-        if (strUUID == null) return Optional.empty();
-        OfflinePlayer player = getServer().getOfflinePlayer(strUUID);
-        return (player == null) ? Optional.empty() : Optional.of(player.getName());
-    }
-
-    @SuppressWarnings("deprecation")
-    public Boolean setMCUsername(Member member, String username) {
-        String dbkey = String.format(whitelistKey, member.getId());
-        if (config.getString(dbkey) == null) {
-            OfflinePlayer player = getServer().getOfflinePlayer(username);
-            if (player != null) {
-                UUID playerid = player.getUniqueId();
-                config.set(dbkey, playerid.toString());
-                saveConfig();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void delWhitelist(Member member) {
-        config.set(String.format(whitelistKey, member.getId()), null);
-        saveConfig();
-    }
 }

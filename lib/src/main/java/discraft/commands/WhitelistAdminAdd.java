@@ -7,16 +7,14 @@ import com.jagrosh.jdautilities.doc.standard.CommandInfo;
 import discraft.*;
 
 @CommandInfo(
-    name = "whitelistadminadd",
+    name = "whitelist",
     description = "Admins can whitelist whoever they want"
 )
 public class WhitelistAdminAdd extends Command {
     private final Bot bot;
-    private final Discraft discraft;
-    public WhitelistAdminAdd(Bot bot, Discraft discraft) {
-        this.name = "whitelistadminadd";
+    public WhitelistAdminAdd(Bot bot) {
+        this.name = "whitelist";
         this.bot = bot;
-        this.discraft = discraft;
     }
 
     @Override
@@ -25,7 +23,7 @@ public class WhitelistAdminAdd extends Command {
             event.replyInDm("Sorry you don't have permission to run this command");
             return;
         }
-        discraft.whitelistAdd(event.getArgs());
+        this.bot.getPlugin().runCommand(String.format("whitelist add %s", event.getArgs()));
         event.reply(String.format("Whitelisted %s", event.getArgs()));
     }    
 }

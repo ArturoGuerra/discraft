@@ -1,5 +1,7 @@
 package discraft;
 
+import discraft.database.DatabaseHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -18,47 +20,61 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.JDA;
 
 public class Bot {
-    private JDA dClient;
-    private JDABuilder builder;
-    private String owner = "";
+    private final String owner;
+    private JDA client;
     private Logger logger;
+    private Discraft plugin;
+    private DatabaseHandler db;
     private List<String> adminRoles = new ArrayList<>();
     private List<String> allowedRoles = new ArrayList<>();
-    public Bot(Discraft discraft, FileConfiguration config, Logger logger) {
+
+    public Bot(Discraft plugin, DatabaseHandler db, FileConfiguration config, Logger logger) throws LoginException, InterruptedException {
+        this.plugin = plugin;
         this.logger = logger;
+        this.db = db;
         this.owner = config.getString("owner");
         this.adminRoles = config.getStringList("admin-roles");
         this.allowedRoles = config.getStringList("allowed-roles");
+        
+        CommandClientBuilder commands = new CommandClientBuilder();
 
-        CommandClientBuilder cClient = new CommandClientBuilder();
+        commands.setOwnerId(config.getString("owner"));
+        commands.setPrefix(config.getString("prefix"));
 
-        cClient.setOwnerId("411323761116184578");
-        cClient.setPrefix(config.getString("prefix"));
+        commands.addCommands(
+            new WhitelistAdminAdd(this),
+            new WhitelistAdminRemove(this),
+            new LinkAccount(this),
+            new UnlinkAccount(this)
+        );
 
-        cClient.addCommands(
-            new WhitelistAdminAdd(this, discraft),
-            new WhitelistAdminRemove(this, discraft),
-            new WhitelistAdd(this, discraft),
-            new WhitelistRemove(this, discraft));
+        JDABuilder builder = JDABuilder.create(config.getString("token"), GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS));
+        builder.addEventListeners(commands.build());
 
-        this.builder = JDABuilder.create(config.getString("token"), GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS));
-        this.builder.addEventListeners(cClient.build());
+        this.client = builder.build();
+        this.client.awaitReady();
+        logger.info("Discord bot started");
+    }
+    
+    public void stop() {
+        this.client.shutdownNow();
+    }
+    
+    public Discraft getPlugin() {
+        return this.plugin;
     }
 
-    public void run() {
-        try {
-            this.dClient = this.builder.build();
-            this.dClient.awaitReady();
-        } catch (LoginException | InterruptedException e) {
-            this.logger.info(e.getMessage());
-        }
+    public Logger getLogger() {
+        return this.logger;
     }
 
-    public void shutdown() {
-        if (this.dClient == null) return;
-        this.dClient.shutdownNow();
+    public JDA getJDA() {
+        return this.client;
     }
 
+    public DatabaseHandler getDB() {
+        return this.db;
+    }
 
     public Boolean isAllowed(Member member) {
         if (this.isAdmin(member).booleanValue() || this.isOwner(member).booleanValue()) return true;
@@ -85,6 +101,5 @@ public class Bot {
     public Boolean isOwner(Member member) {
         if (owner.equals(member.getId())) return true;
         return false;
-    }
-    
+    }    
 }

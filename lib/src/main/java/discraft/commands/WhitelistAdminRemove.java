@@ -6,16 +6,14 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.doc.standard.CommandInfo;
 
 @CommandInfo(
-    name = "whitelistadminremove",
+    name = "unwhitelist",
     description = "Admins can remove anyone from whitelist"
 )
 public class WhitelistAdminRemove extends Command {
     private final Bot bot;
-    private final Discraft discraft;
-    public WhitelistAdminRemove(Bot bot, Discraft discraft) {
-        this.name = "whitelistadminremove";
+    public WhitelistAdminRemove(Bot bot) {
+        this.name = "unwhitelist";
         this.bot = bot;
-        this.discraft = discraft;
     }
 
     @Override
@@ -25,7 +23,7 @@ public class WhitelistAdminRemove extends Command {
             return;
         }
 
-        discraft.whitelistRemove(event.getArgs());
+        this.bot.getPlugin().runCommand(String.format("whitelist remove %s", event.getArgs()));
         event.reply(String.format("Unwhitelisted %s", event.getArgs()));
     }
     

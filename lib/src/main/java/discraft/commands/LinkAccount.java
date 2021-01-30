@@ -1,25 +1,28 @@
 package discraft.commands;
 
+import java.util.UUID;
+
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.doc.standard.CommandInfo;
 
+import org.bukkit.OfflinePlayer;
+
 import discraft.*;
 
 @CommandInfo(
-    name = "whitelistadd",
+    name = "link",
     description = "Adds user to whitelist"
 )
-public class WhitelistAdd extends Command {
+public class LinkAccount extends Command {
     private final Bot bot;
-    private final Discraft discraft;
-    public WhitelistAdd(Bot bot, Discraft discraft) {
-        this.name = "whitelistadd";
+    public LinkAccount(Bot bot) {
+        this.name = "link";
         this.bot = bot;
-        this.discraft = discraft;
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void execute(CommandEvent event) {
         if (!this.bot.isAllowed(event.getMember()).booleanValue()) {
             event.replyInDm("Sorry you don't have permission to run this command");
@@ -32,8 +35,10 @@ public class WhitelistAdd extends Command {
             return;
         }
 
-        if (this.discraft.setMCUsername(event.getMember(), username).booleanValue()) {
-            discraft.whitelistAdd(event.getArgs());
+        OfflinePlayer player = this.bot.getPlugin().getServer().getOfflinePlayer(username);
+
+        if (this.bot.getDB().link(event.getMember().getId(), player.getUniqueId()).booleanValue()) {
+            player.setWhitelisted(true);
             event.reply(String.format("Whitelisted: %s", username));
         } else {
             event.reply("It appear you have already whitelisted yourself, contact an admin if this is a mistake");
