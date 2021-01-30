@@ -4,10 +4,8 @@
 package discraft;
 
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import net.dv8tion.jda.api.entities.Member;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -15,7 +13,6 @@ import java.util.logging.Logger;
 import javax.security.auth.login.LoginException;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -24,7 +21,6 @@ import java.util.HashMap;
 import discraft.database.DatabaseHandler;
 
 public class Discraft extends JavaPlugin {
-    private final String whitelistKey = "whitelist.%s";
     private FileConfiguration config = getConfig();
     private Logger logger = getLogger();
     private Optional<Bot> bot;

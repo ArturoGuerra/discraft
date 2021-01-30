@@ -1,5 +1,3 @@
-discraft/database/DatabaseHandler.java
- discraft.database.DatabaseHandler
 discraft/database/LinkedAccount.java
  discraft.database.LinkedAccount
 discraft/commands/WhitelistAdminRemove.java
@@ -8,9 +6,11 @@ discraft/Discraft.java
  discraft.Discraft
 discraft/commands/WhitelistAdminAdd.java
  discraft.commands.WhitelistAdminAdd
-discraft/commands/LinkAccount.java
- discraft.commands.LinkAccount
+discraft/database/DatabaseHandler.java
+ discraft.database.DatabaseHandler
 discraft/Bot.java
  discraft.Bot
+discraft/commands/LinkAccount.java
+ discraft.commands.LinkAccount
 discraft/commands/UnlinkAccount.java
  discraft.commands.UnlinkAccount

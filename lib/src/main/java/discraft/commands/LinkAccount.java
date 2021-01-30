@@ -1,6 +1,5 @@
 package discraft.commands;
 
-import java.util.UUID;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
