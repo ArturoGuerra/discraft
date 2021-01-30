@@ -1,6 +1,0 @@
-name: Discraft
-main: discraft.Discraft
-version: "1.0"
-api-version: 1.13
-api:
-- "1.13"
